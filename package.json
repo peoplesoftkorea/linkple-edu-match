@@ -1,0 +1,11 @@
+{
+  "name": "edu-instructor-match",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:engine": "tsx lib/engine/engine.test.ts",
+    "test:roster": "tsx tools/import-roster.mts --selftest"
+  },
+  "devDependencies": { "tsx": "^4.19.2", "typescript": "^5.7.3" }
+}

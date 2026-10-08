@@ -1,0 +1,276 @@
+%% 자동 생성 — tools/make-erd.mjs · 운영 환경 스키마 실측본
+%% ⛔손으로 고치지 않는다. 스키마를 바꾼 뒤 다시 생성한다.
+%% 표 15개 · 관계 29개 · 공통 칸(created_at·updated_at)은 생략
+%% 외부 참조 2종(컬럼 정의 없이 관계만 그린다): auth.users · srm_requests
+erDiagram
+  auth_users |o--o{ edu_attendance : "checked_by"
+  edu_enrollments ||--o{ edu_attendance : "enrollment_id ⟲"
+  edu_sessions ||--o{ edu_attendance : "session_id ⟲"
+  edu_cohorts ||--o{ edu_credentials : "cohort_id"
+  edu_enrollments ||--o{ edu_credentials : "enrollment_id"
+  edu_cohorts ||--o{ edu_enrollments : "cohort_id"
+  srm_requests |o--o{ edu_enrollments : "srm_request_id"
+  auth_users |o--o{ edu_enrollments : "user_id"
+  edu_cohorts ||--o{ edu_feedback : "cohort_id"
+  edu_enrollments ||--o{ edu_feedback : "enrollment_id"
+  edu_cohorts |o--o{ edu_instructor_engagements : "cohort_id ⟲"
+  edu_instructors ||--o{ edu_instructor_engagements : "instructor_id"
+  edu_match_scores |o--o{ edu_instructor_engagements : "match_score_id"
+  edu_sessions |o--o{ edu_instructor_engagements : "session_id ⟲"
+  auth_users |o--o{ edu_instructors : "user_id"
+  edu_cohorts |o--o{ edu_match_runs : "cohort_id ⟲"
+  edu_org_orders |o--o{ edu_match_runs : "order_id ⟲"
+  auth_users |o--o{ edu_match_runs : "requested_by"
+  edu_sessions |o--o{ edu_match_runs : "session_id ⟲"
+  edu_instructors ||--o{ edu_match_scores : "instructor_id ⟲"
+  edu_match_runs ||--o{ edu_match_scores : "run_id ⟲"
+  edu_cohorts |o--o{ edu_notices : "cohort_id ⟲"
+  edu_org_orders ||--o{ edu_org_invoices : "order_id ⟲"
+  edu_enrollments |o--o{ edu_org_members : "enrollment_id"
+  edu_org_orders ||--o{ edu_org_members : "order_id ⟲"
+  edu_cohorts |o--o{ edu_org_orders : "cohort_id"
+  edu_cohorts ||--o{ edu_outcomes : "cohort_id"
+  edu_enrollments ||--o{ edu_outcomes : "enrollment_id"
+  edu_cohorts ||--o{ edu_sessions : "cohort_id ⟲"
+
+  edu_attendance {
+    uuid id PK
+    uuid session_id FK
+    uuid enrollment_id FK
+    text status
+    timestamptz checked_at
+    uuid checked_by FK "null 허용"
+    text note "null 허용"
+  }
+  edu_cohorts {
+    uuid id PK
+    text program_slug
+    int cohort_no
+    text title "null 허용"
+    text subtitle "null 허용"
+    text status
+    date recruit_from "null 허용"
+    date recruit_to "null 허용"
+    date starts_on "null 허용"
+    date ends_on "null 허용"
+    int capacity "null 허용"
+    int price "null 허용"
+    text price_note "null 허용"
+    text venue "null 허용"
+    text venue_note "null 허용"
+    int attend_pct_required
+    bool venue_confirmed
+    text payment_method
+    bool is_test
+  }
+  edu_credentials {
+    uuid id PK
+    uuid enrollment_id FK
+    uuid cohort_id FK
+    text public_id
+    date issued_on
+    timestamptz issued_at
+    int sessions_total
+    int sessions_attended
+    int attendance_pct
+    int required_pct
+    text achievement_name
+    text issuer_did
+    jsonb assertion
+    text assertion_jwt "null 허용"
+    timestamptz revoked_at "null 허용"
+    text revoke_reason "null 허용"
+  }
+  edu_enrollments {
+    uuid id PK
+    uuid cohort_id FK
+    uuid user_id FK "null 허용"
+    text applicant_email
+    text applicant_name
+    text contact_phone "null 허용"
+    text company "null 허용"
+    text dept "null 허용"
+    text position "null 허용"
+    text status
+    text payment_status
+    text order_id "null 허용"
+    int amount "null 허용"
+    text payment_key "null 허용"
+    text payment_method "null 허용"
+    timestamptz paid_at "null 허용"
+    uuid srm_request_id FK "null 허용"
+    uuid inquiry_id "null 허용"
+    text note "null 허용"
+    timestamptz consent_at
+    bool marketing_consent
+    timestamptz marketing_consent_at "null 허용"
+  }
+  edu_feedback {
+    uuid id PK
+    uuid enrollment_id FK
+    uuid cohort_id FK
+    smallint rating
+    smallint recommend "null 허용"
+    text helped "null 허용"
+    text lacked "null 허용"
+    bool consent_public
+    text public_display "null 허용"
+    text public_quote "null 허용"
+    timestamptz submitted_at
+    timestamptz published_at "null 허용"
+  }
+  edu_instructor_engagements {
+    uuid id PK
+    uuid instructor_id FK
+    text scope
+    uuid session_id FK "null 허용"
+    uuid cohort_id FK "null 허용"
+    text origin
+    text status
+    int fee "null 허용"
+    text fee_basis "null 허용"
+    text message "null 허용"
+    timestamptz decided_at "null 허용"
+    text decline_reason "null 허용"
+    text withdrawn_reason "null 허용"
+    uuid match_score_id FK "null 허용"
+    bool is_test
+  }
+  edu_instructors {
+    uuid id PK
+    text name
+    text title "null 허용"
+    array expertise
+    text career "null 허용"
+    array regions
+    int day_rate "null 허용"
+    bool contactable
+    text source "null 허용"
+    text note "null 허용"
+    bool is_test
+    array methods
+    int years "null 허용"
+    array audience
+    jsonb value_profile "null 허용"
+    int hourly_rate "null 허용"
+    text email "null 허용"
+    text phone "null 허용"
+    text bio "null 허용"
+    text portfolio_url "null 허용"
+    text photo_url "null 허용"
+    uuid user_id FK "null 허용"
+    timestamptz deleted_at "null 허용"
+  }
+  edu_match_runs {
+    uuid id PK
+    uuid order_id FK "null 허용"
+    uuid cohort_id FK "null 허용"
+    uuid session_id FK "null 허용"
+    jsonb demand
+    jsonb weights
+    text engine_rev "null 허용"
+    uuid requested_by FK "null 허용"
+    int candidates_n
+    text note "null 허용"
+    bool is_test
+  }
+  edu_match_scores {
+    uuid id PK
+    uuid run_id FK
+    uuid instructor_id FK
+    numeric total
+    int rank
+    jsonb axes
+    bool culture_measured
+    bool hard_filtered
+  }
+  edu_notices {
+    uuid id PK
+    text slug
+    uuid cohort_id FK "null 허용"
+    text audience
+    text title
+    text body
+    bool pinned
+    timestamptz published_at "null 허용"
+  }
+  edu_org_invoices {
+    uuid id PK
+    uuid order_id FK
+    text biz_no
+    text corp_name
+    text ceo_name
+    text address
+    text biz_type "null 허용"
+    text biz_item "null 허용"
+    text recipient_email
+    int supply_amount
+    int vat_amount
+    text status
+    text issue_type
+    timestamptz issued_at "null 허용"
+    text nts_confirm_no "null 허용"
+    text cancel_reason "null 허용"
+    bool is_test
+  }
+  edu_org_members {
+    uuid id PK
+    uuid order_id FK
+    text name
+    text email
+    text phone "null 허용"
+    text dept "null 허용"
+    text position "null 허용"
+    uuid enrollment_id FK "null 허용"
+  }
+  edu_org_orders {
+    uuid id PK
+    text order_no
+    text org_name
+    text org_biz_no "null 허용"
+    text org_address "null 허용"
+    text contact_name
+    text contact_email
+    text contact_phone "null 허용"
+    text contact_dept "null 허용"
+    text program_slug
+    int headcount
+    date preferred_from "null 허용"
+    text venue_type
+    text venue_region "null 허용"
+    int unit_price
+    numeric discount_rate
+    int travel_fee
+    int subtotal
+    int vat
+    int total
+    text price_basis "null 허용"
+    text status
+    uuid cohort_id FK "null 허용"
+    text note "null 허용"
+    bool is_test
+  }
+  edu_outcomes {
+    uuid id PK
+    uuid enrollment_id FK
+    uuid cohort_id FK
+    date due_on
+    text baseline "null 허용"
+    text current_state "null 허용"
+    text verdict
+    text note "null 허용"
+    timestamptz submitted_at
+  }
+  edu_sessions {
+    uuid id PK
+    uuid cohort_id FK
+    int session_no
+    text title "null 허용"
+    text topic "null 허용"
+    text instructor "null 허용"
+    date held_on "null 허용"
+    timestamptz starts_at "null 허용"
+    timestamptz ends_at "null 허용"
+    text venue "null 허용"
+    bool counts_for_attendance
+  }
