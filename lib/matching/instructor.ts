@@ -24,6 +24,8 @@ export type InstructorRow = {
   regions: string[] | null         // 하드 필터
   contactable: boolean
   deleted_at?: string | null
+  /** 등록 시각 — 동점을 가르는 데 쓴다(이름을 쓰지 않는 이유는 rankInstructors 주석) */
+  created_at?: string | null
 }
 
 /** 교육 발주의 수요 — 견적 폼·발주 협의에서 받는다. */
@@ -152,7 +154,15 @@ export function rankInstructors(
     })
     .sort((a, b) =>
       a.match.eligible !== b.match.eligible ? (a.match.eligible ? -1 : 1)
-      : b.match.percent - a.match.percent || a.instructor.name.localeCompare(b.instructor.name),
+      // 🔴[반사실 테스트 2026-10-11 fairprobe] 동점을 «이름 가나다순»으로 갈랐다 —
+      //   「강유진」이 「하유진」을 앞선다. 성(姓)은 직무와 무관하고 혈통·지역과 상관이 있다.
+      //   엔진 규율 3(보호속성과 «그 대리변수»는 입력에 없다)이 tie-break 에서 샜다.
+      //   ⇒ 등록이 이른 쪽을 앞세운다 — 채용 축의 「먼저 지원한 사람 우선」과 같은 논리이고,
+      //     보호속성과 무관하며 누구에게나 설명된다. 등록 시각이 없으면 id 로(결정론적).
+      //   ⛔이름은 «표시»에만 쓴다. 순위를 가르는 데 쓰지 않는다.
+      : b.match.percent - a.match.percent
+        || (a.instructor.created_at ?? '').localeCompare(b.instructor.created_at ?? '')
+        || a.instructor.id.localeCompare(b.instructor.id),
     )
 
   const excluded = [

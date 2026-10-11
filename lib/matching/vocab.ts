@@ -190,6 +190,7 @@ export type Method    = (typeof METHODS)[number]
 export type Audience  = (typeof AUDIENCES)[number]
 export type ValueAxis = (typeof VALUE_AXES)[number]
 export type Region    = (typeof REGIONS)[number]
+export type VenueType = (typeof VENUE_TYPES)[number]
 
 /** 사전 한 벌 — 검사기가 축 이름으로 집어 쓴다. 축을 늘리면 여기에도 보탠다. */
 export const VOCAB = {

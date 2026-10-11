@@ -29,7 +29,7 @@ export function AnalyticsConsent() {
 
   return (
     <div role="dialog" aria-label="분석 쿠키 사용 안내" style={{
-      position: 'fixed', left: 16, right: 16, bottom: 16, maxWidth: 520, zIndex: 50,
+      position: 'fixed', left: 16, right: 16, bottom: 16, maxWidth: 'var(--container-narrow)', zIndex: 50,
       background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
       padding: 16, boxShadow: 'var(--shadow)', fontSize: 13, lineHeight: 1.7,
     }}>

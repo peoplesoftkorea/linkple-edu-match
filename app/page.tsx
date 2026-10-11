@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="wrap" style={{ paddingBlock: 64 }}>
+    <main className="wrap" style={{ paddingBlock: 'var(--sec-pad)' }}>
       <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--brand-deep)', letterSpacing: '.02em' }}>
         링플 · Linkple
       </p>

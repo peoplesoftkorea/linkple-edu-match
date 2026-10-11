@@ -13,7 +13,8 @@ const idx = process.argv.indexOf('--source')
 const SOURCE = idx > 0 ? process.argv[idx + 1] : '샘플풀-2026-10'
 
 const out = execFileSync('kps-db-readonly.sh', [
-  `select id, name, expertise, methods, audience, years, value_profile, regions, contactable, deleted_at
+  `select id, name, expertise, methods, audience, years, value_profile, regions, contactable, deleted_at, created_at,
+          coalesce(note, '') as note
      from public.edu_instructors where source = '${SOURCE.replace(/'/g, "''")}' order by name;`,
 ], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 })
 const rows = JSON.parse(out.slice(out.indexOf('['))) as InstructorRow[]
@@ -53,27 +54,46 @@ console.log(`\n═══ 매칭 실측 — 출처 「${SOURCE}」 강사 ${rows.
 
 // ★축별 «입력 충족률» — 칸이 비면 그 축은 0 또는 중립이 되고, 점수는 나오지만 재지 않은 것이다.
 //   ⛔「매칭이 된다」와 「5축이 작동한다」는 다른 말이다. 명부 요청 양식은 이 표에서 역산한다.
-const FILLED: { axis: string; label: string; n: number; effect: string }[] = [
+const FILLED: { axis: string; label: string; effect: string; pick: (r: InstructorRow) => boolean }[] = [
   { axis: 'K', label: '전문 분야(expertise)', effect: '비면 주제 적합 0',
-    n: rows.filter((r) => (r.expertise ?? []).length > 0).length },
+    pick: (r) => (r.expertise ?? []).length > 0 },
   { axis: 'S', label: '강의 방식(methods)', effect: '비면 방식 적합 0',
-    n: rows.filter((r) => (r.methods ?? []).length > 0).length },
+    pick: (r) => (r.methods ?? []).length > 0 },
   { axis: 'A', label: '대상 층(audience)', effect: '비면 우대요건 0',
-    n: rows.filter((r) => (r.audience ?? []).length > 0).length },
+    pick: (r) => (r.audience ?? []).length > 0 },
   { axis: 'A', label: '강의 경력 연수(years)', effect: '비면 최소 경력을 적용하지 못한다',
-    n: rows.filter((r) => r.years != null).length },
+    pick: (r) => r.years != null },
   { axis: 'C', label: '교육 지향 3축 이상(value_profile)', effect: '비면 중립 0.5 — 재지 않은 것이다',
-    n: rows.filter((r) => Object.keys(r.value_profile ?? {}).length >= 3).length },
+    pick: (r) => Object.keys(r.value_profile ?? {}).length >= 3 },
   { axis: '—', label: '출강 권역(regions)', effect: '비면 권역 요건에서 전부 탈락',
-    n: rows.filter((r) => (r.regions ?? []).length > 0).length },
+    pick: (r) => (r.regions ?? []).length > 0 },
 ]
+// ★★대조군을 분모에서 가른다 — 대조군은 «일부러» 칸을 비워 둔 행이다.
+//   섞어 세면 의도된 빈칸이 결함으로 읽힌다[실측 2026-10-11: C축 20/23(87%) 의 미달 3명이
+//   전원 「(샘플·대조군)」이었다 — 「87%」만 보면 명부를 더 받아야 할 것처럼 읽힌다].
+//   판별 = `note` 가 「대조군」으로 시작하는 행. ⛔이름 문자열로 가르지 않는다(표기가 바뀐다).
+type WithNote = InstructorRow & { note?: string }
+const isCtrl = (r: WithNote) => (r.note ?? '').startsWith('대조군')
+const ctrl = (rows as WithNote[]).filter(isCtrl)
+const real = (rows as WithNote[]).filter((r) => !isCtrl(r))
+
 console.log('\n── 축별 입력 충족률 — 칸이 비면 그 축은 «재지 않은» 것이다')
+console.log(`   분모 ${rows.length}명 = 후보 ${real.length} + 대조군 ${ctrl.length}(의도된 빈칸)`)
 for (const f of FILLED) {
-  const pct = Math.round((f.n / rows.length) * 100)
-  const mark = f.n === rows.length ? '✅' : f.n === 0 ? '🔴' : '🟡'
-  console.log(`  ${mark} ${f.axis}축 ${f.label} — ${f.n}/${rows.length}명(${pct}%) · ${f.effect}`)
+  const n = rows.filter(f.pick).length
+  const nReal = real.filter(f.pick).length
+  // 판정은 «후보 분모»로 한다 — 대조군까지 채우라는 요구는 그 자산을 없애라는 말이 된다.
+  const mark = nReal === real.length ? '✅' : nReal === 0 ? '🔴' : '🟡'
+  const tail = n !== nReal ? ` · ⇒ 후보만 ${nReal}/${real.length}명${nReal === real.length ? ' ✅전건' : ''}` : ''
+  console.log(`  ${mark} ${f.axis}축 ${f.label} — ${n}/${rows.length}명(${Math.round((n / rows.length) * 100)}%) · ${f.effect}${tail}`)
 }
-const deadAxes = FILLED.filter((f) => f.n === 0).map((f) => f.label)
+if (ctrl.length > 0) {
+  console.log(`   ── 대조군 ${ctrl.length}명(분모에서 가름) — 비어 있어야 «정상»이다`)
+  for (const c of ctrl) console.log(`      · ${c.name} — ${c.note}`)
+}
+// ⛔`f.n` 잔재였다 — FILLED 를 pick 기반으로 바꾸면서 이 줄을 놓쳤다[미러 tsc 가 적발 2026-10-11].
+//   «후보» 분모로 센다(대조군은 일부러 비운 행이라 「죽은 축」이 아니다).
+const deadAxes = FILLED.filter((f) => real.filter(f.pick).length === 0).map((f) => f.label)
 if (deadAxes.length) console.log(`  ⚠️ 입력이 0인 칸 ${deadAxes.length}개 — 명부 수령 시 이 칸을 함께 받아야 5축이 선다`)
 
 let covered = 0
