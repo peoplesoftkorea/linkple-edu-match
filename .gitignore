@@ -2,3 +2,10 @@ node_modules/
 .env
 .env.local
 *.log
+
+# ★Next 도입(2026-10-11)으로 생기는 산출물 — 리포에 담지 않는다
+.next
+out
+.DS_Store
+next-env.d.ts
+*.tsbuildinfo

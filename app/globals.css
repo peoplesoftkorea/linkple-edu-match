@@ -1,0 +1,16 @@
+/* 디자인 토큰 — 사업 리포 packages/ui/globals.css 에서 «값만» 가져왔다.
+   ⛔공용 패키지를 import 하지 않는다. 미러는 독립 실행이어야 한다(제출 요건). */
+:root{
+  --brand:#147B58; --brand-deep:#0F6347; --brand-bright:#1FA173; --brand-tint:#E3F2EC;
+  --ink:#0F1E18; --slate:#334155; --muted:#64748B;
+  --bg:#FFFFFF; --surface:#F6FAF8; --border:#E2E8F0; --dark:#07140E;
+  --radius:16px; --radius-ctl:10px;
+  --shadow:0 10px 30px -12px rgba(15,30,24,.18);
+  --body:'Pretendard',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--brand-deep)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
