@@ -1,6 +1,7 @@
 %% 자동 생성 — tools/make-erd.mjs · 운영 환경 스키마 실측본
 %% ⛔손으로 고치지 않는다. 스키마를 바꾼 뒤 다시 생성한다.
 %% 표 22개 · 관계 47개 · 공통 칸(created_at·updated_at)은 생략
+%% ⛔뷰 1개는 그리지 않는다(실체가 아니라 조회 경로다): edu_public_feedback
 %% 외부 참조 2종(컬럼 정의 없이 관계만 그린다): auth.users · srm_requests
 erDiagram
   auth_users |o--o{ edu_attendance : "checked_by"

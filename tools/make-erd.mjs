@@ -20,7 +20,10 @@ const fks   = JSON.parse(readFileSync(fksPath, 'utf8'))
 const kinds = JSON.parse(readFileSync(kindsPath, 'utf8'))
 
 // 뷰는 ERD 에 그리지 않는다 — 실체가 아니라 조회 경로다.
+// ★★«몇 개를 걸렀는지» 말한다 — 안 적으면 다음 사람이 「표 23개인데 ERD 22개」를
+//   «누락»으로 읽는다[2026-10-11 실제로 그렇게 읽었다]. 제외는 설계이고, 설계는 보여야 한다.
 const tables = new Set(kinds.filter((r) => r.table_type === 'BASE TABLE').map((r) => r.table_name))
+const views = kinds.filter((r) => r.table_type !== 'BASE TABLE').map((r) => r.table_name)
 
 // 전 표에 있는 공통 칸은 생략하고 각주로 대신한다. 그리지 않으면 ERD 가 읽힌다.
 const OMIT = new Set(['created_at', 'updated_at'])
@@ -54,6 +57,8 @@ out.push('%% 자동 생성 — tools/make-erd.mjs · 운영 환경 스키마 실
 out.push('%% ⛔손으로 고치지 않는다. 스키마를 바꾼 뒤 다시 생성한다.')
 const external = [...new Set(fks.map((f) => f.dst))].filter((d) => !tables.has(d))
 out.push(`%% 표 ${byTable.size}개 · 관계 ${fks.length}개 · 공통 칸(created_at·updated_at)은 생략`)
+// ★뷰를 «몇 개 걸렀는지» 적는다 — 운영 표 수와 ERD 표 수가 달라 보이는 이유가 여기 있다.
+if (views.length) out.push(`%% ⛔뷰 ${views.length}개는 그리지 않는다(실체가 아니라 조회 경로다): ${views.join(' · ')}`)
 out.push(`%% 외부 참조 ${external.length}종(컬럼 정의 없이 관계만 그린다): ${external.join(' · ') || '없음'}`)
 out.push('erDiagram')
 
