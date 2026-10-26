@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="링플">
+  <rect width="32" height="32" rx="7" fill="#0f2d4a"/>
+  <!-- 발주와 강사를 잇는다 — 두 점과 그 사이의 선 -->
+  <circle cx="10" cy="11" r="3.2" fill="#fff"/>
+  <circle cx="22" cy="21" r="3.2" fill="#fff"/>
+  <path d="M12.4 13.2 19.6 18.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
