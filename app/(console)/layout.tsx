@@ -13,6 +13,7 @@ const NAV = [
   { href: '/edu', label: '대시보드' },
   { href: '/edu/orders', label: '발주' },
   { href: '/edu/matching', label: '강사 배정' },
+  { href: '/edu/pricing', label: '단가 분석' },
   { href: '/edu/payouts', label: '정산' },
   { href: '/edu/notifications', label: '알림' },
   { href: '/edu/aftercare', label: '사후관리' },
