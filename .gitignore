@@ -10,3 +10,6 @@ out
 next-env.d.ts
 *.tsbuildinfo
 .vercel
+
+# ★Supabase CLI 가 작업 디렉토리에 남기는 것 — 미러에 담기면 가드가 「목록 밖」으로 잡는다
+supabase/.temp/
