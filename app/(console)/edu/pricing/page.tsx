@@ -45,10 +45,10 @@ export default async function EduPricingPage({
 
       {/* ★대조군을 «먼저» 보인다 — 식이 아는 사례에서 얼마나 빗나가는지 모르고 모르는 사례에 쓰지 않는다 */}
       <Card>
-        <CardHeader><CardTitle>이 산식을 운영 3과정에 되돌리면</CardTitle></CardHeader>
+        <CardHeader><CardTitle>이 산식을 운영 {control.length}과정에 되돌리면</CardTitle></CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-3">
-            같은 식에 운영 중인 세 과정의 회차·시간·초빙 수를 넣어 본 값입니다. 확정 단가와의 차이가 이 산식의 오차 폭입니다.
+            같은 식에 운영 중인 과정의 회차·시간·초빙 수를 넣어 본 값입니다. 확정 단가와의 차이가 이 산식의 오차 폭입니다.
             맞춤 견적의 숫자도 같은 폭으로 흔들립니다.
           </p>
           <Table>
@@ -75,7 +75,7 @@ export default async function EduPricingPage({
           </Table>
           <p className="text-xs text-muted-foreground mt-2">
             인당·시간당 단가 기준 · 사내 출강 · 최소 청구 인원 기준. 목표 직접비율 {Math.round(TARGET_DIRECT_RATIO * 100)}%는
-            이 세 과정의 실제 구조에서 역산한 값입니다.
+            위 과정들의 실제 구조에서 역산한 값입니다.
           </p>
         </CardContent>
       </Card>
