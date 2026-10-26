@@ -30,11 +30,32 @@ C축은 **가치축 3개 미만이면 `null`** 을 반환한다. 측정하지 �
 3. 보호속성과 그 대리변수는 입력에 없다
 4. 매칭에 LLM 을 쓰지 않는다 — 규칙 기반이 설명가능성이 가장 높고 비용이 0이다
 
+## 화면
+
+운영자 콘솔 하나로 발주부터 정산까지 간다. 각 화면은 한 단계를 맡고, 단계 사이의 전이는
+데이터베이스 트리거가 집행한다(화면이 잊어도 상태가 어긋나지 않는다).
+
+| 경로 | 하는 일 |
+|---|---|
+| `/edu` | 기수 현황 — 진행 중인 과정과 그 단계 |
+| `/edu/orders` | 발주 접수와 상태 전이(견적 → 수주 → 확정 → 청구 → 완료) |
+| `/edu/matching` | 회차별 강사 후보 산출 — 5축 적합도와 축별 사유 |
+| `/edu/matching/[runId]` | 산출 결과·확정·위촉 계약 생성 |
+| `/edu/matching/[runId]/rationale` | **배정 근거서** — 발주사에 제출하는 문서(인쇄용) |
+| `/edu/[cohortId]` | 회차·출결·수료 판정 |
+| `/edu/payouts` | 강사료 정산과 원천징수 |
+| `/edu/notifications` | 알림 발행 내역 |
+| `/edu/aftercare` | 수료 이후 성과 추적 |
+
 ## 구조
 
 ```
+app/(console)/   운영자 콘솔 화면 — 위 표의 경로들
+components/      표·폼 원자
 lib/engine/      5축 적합도 산식 — 도메인에 중립이다
 lib/matching/    교육 발주 ↔ 강사 어댑터 + 통제 어휘 사전
+lib/contracts/   위촉계약 생성 — 토큰 채움 · 빈칸 검증
+lib/labor/       원천징수(법정 수치)
 supabase/        스키마와 그 제약 검증
 tools/           매칭 실측 · 어휘 검사 · 명부 표준화 · ERD 생성
 docs/            ERD · 자율 결정 기록 · 명부 양식
@@ -43,12 +64,30 @@ docs/            ERD · 자율 결정 기록 · 명부 양식
 ## 돌려 보기
 
 ```bash
-npx tsx lib/engine/engine.test.ts        # 산식 검증(경계값 · 반사실 공정성)
+npm install
+cp .env.example .env.local     # 값을 채운다
+npm run dev                    # http://localhost:3000
+```
+
+산식과 도구만 확인하려면 데이터베이스 없이도 된다.
+
+```bash
+npx tsx lib/engine/engine.test.ts            # 산식 검증(경계값 · 반사실 공정성)
 npx tsx tools/import-roster.mts --selftest   # 명부 표준화 자가시험
 ```
 
-운영 데이터가 필요한 도구(`matchprobe`·`vocabguard`)는 DB 접속이 있어야 돌아간다.
-`.env.example` 을 복사해 값을 채운다.
+`matchprobe`·`vocabguard` 는 DB 접속이 있어야 돌아간다.
+
+## 공개본에 관하여
+
+이 저장소는 운영 저장소에서 **목록(화이트리스트)으로 추출**한 공개본이다. 손으로 옮긴 파일은
+없고, 추출할 때마다 전체를 다시 쓴다. 다음 둘은 공개본에서 **다른 값**으로 바뀐다.
+
+- **위촉계약 문안** — 조항과 서명란의 당사자 정보는 운영 주체의 것이라 담지 않는다.
+  토큰 구조가 같은 샘플 문안으로 대체했다(`lib/contracts/instructor-engagement.ts`).
+- **금액 상수** — 과정별 기준 금액과 그 산정 근거는 담지 않는다. 형상만 같은 예시값이다.
+
+표시되는 데이터는 전부 시연용 시드이며 실제 거래·개인정보가 아니다.
 
 ## 자율 결정
 

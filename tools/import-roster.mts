@@ -16,7 +16,7 @@ import { execFileSync } from 'node:child_process'
 import {
   normalizeExpertise, normalizeRegion, extractYears, extractAudience,
   strayValues, extractMethods, VOCAB, type Audience, type Expertise, type Method, type Region,
-} from 'edu-instructor-match/edu/vocab'
+} from '@/lib/matching/vocab'
 
 const argv = process.argv.slice(2)
 const flag = (name: string) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : undefined }

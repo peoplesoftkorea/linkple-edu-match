@@ -18,7 +18,7 @@
 // 사용: export DATABASE_URL=...  # .env.example 참조
 //      npx tsx tools/vocabguard.mts [--selftest] [--source 샘플풀-2026-10]
 import { execFileSync } from 'node:child_process'
-import { VOCAB, strayValues, cultureMeasurable, type VocabAxis } from 'edu-instructor-match/edu/vocab'
+import { VOCAB, strayValues, cultureMeasurable, type VocabAxis } from '@/lib/matching/vocab'
 
 const SELFTEST = process.argv.includes('--selftest')
 const si = process.argv.indexOf('--source')

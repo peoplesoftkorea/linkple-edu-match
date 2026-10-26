@@ -1,7 +1,7 @@
 %% 자동 생성 — tools/make-erd.mjs · 운영 환경 스키마 실측본
 %% ⛔손으로 고치지 않는다. 스키마를 바꾼 뒤 다시 생성한다.
-%% 표 22개 · 관계 47개 · 공통 칸(created_at·updated_at)은 생략
-%% ⛔뷰 1개는 그리지 않는다(실체가 아니라 조회 경로다): edu_public_feedback
+%% 표 24개 · 관계 50개 · 공통 칸(created_at·updated_at)은 생략
+%% ⛔뷰 2개는 그리지 않는다(실체가 아니라 조회 경로다): edu_order_direct_cost_v · edu_public_feedback
 %% 외부 참조 2종(컬럼 정의 없이 관계만 그린다): auth.users · srm_requests
 erDiagram
   auth_users |o--o{ edu_attendance : "checked_by"
@@ -13,6 +13,7 @@ erDiagram
   edu_instructor_engagements ||--o{ edu_contracts : "engagement_id"
   edu_cohorts ||--o{ edu_credentials : "cohort_id"
   edu_enrollments ||--o{ edu_credentials : "enrollment_id"
+  edu_org_orders ||--o{ edu_direct_costs : "order_id"
   edu_cohorts ||--o{ edu_enrollments : "cohort_id"
   srm_requests |o--o{ edu_enrollments : "srm_request_id"
   auth_users |o--o{ edu_enrollments : "user_id"
@@ -46,6 +47,8 @@ erDiagram
   edu_enrollments ||--o{ edu_outcomes : "enrollment_id"
   edu_org_orders |o--o{ edu_pricing_runs : "order_id"
   auth_users |o--o{ edu_pricing_runs : "requested_by"
+  auth_users |o--o{ edu_revenue_shares : "approved_by"
+  edu_org_orders ||--o{ edu_revenue_shares : "order_id"
   edu_cohorts ||--o{ edu_reviews : "cohort_id ⟲"
   edu_instructors |o--o{ edu_reviews : "instructor_id ⟲"
   edu_enrollments |o--o{ edu_reviews : "rater_enrollment_id ⟲"
@@ -123,6 +126,15 @@ erDiagram
     text assertion_jwt "null 허용"
     timestamptz revoked_at "null 허용"
     text revoke_reason "null 허용"
+  }
+  edu_direct_costs {
+    uuid id PK
+    uuid order_id FK
+    text item
+    int amount
+    text note "null 허용"
+    date incurred_on "null 허용"
+    bool is_test
   }
   edu_enrollments {
     uuid id PK
@@ -373,6 +385,27 @@ erDiagram
     bool is_test
     uuid requested_by FK "null 허용"
   }
+  edu_revenue_shares {
+    uuid id PK
+    uuid order_id FK
+    text model
+    int revenue
+    int direct_cost
+    int lead_fee_paid
+    int gross_profit
+    numeric lead_share_rate
+    int lead_share
+    int company_share
+    bool provisional
+    text basis
+    text status
+    text cancel_reason "null 허용"
+    timestamptz approved_at "null 허용"
+    uuid approved_by FK "null 허용"
+    timestamptz paid_at "null 허용"
+    text paid_note "null 허용"
+    bool is_test
+  }
   edu_reviews {
     uuid id PK
     text subject
@@ -399,4 +432,8 @@ erDiagram
     timestamptz ends_at "null 허용"
     text venue "null 허용"
     bool counts_for_attendance
+    timestamptz open_call_at "null 허용"
+    timestamptz open_call_closed_at "null 허용"
+    text open_call_note "null 허용"
+    int open_call_fee "null 허용"
   }

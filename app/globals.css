@@ -1,23 +1,185 @@
-/* 디자인 토큰 — 사업 리포 packages/ui/globals.css 에서 «값만» 가져왔다.
-   ⛔공용 패키지를 import 하지 않는다. 미러는 독립 실행이어야 한다(제출 요건). */
-:root{
-  /* 섹션 상하 패딩 — 매직넘버를 쓰지 않는다(공용 규율 S3-섹션리듬). 미러는
-     packages/ui 를 쓰지 않으므로 같은 뜻의 토큰을 여기 둔다. */
-  --sec-pad: 64px;
-  /* 본문 최대 너비·동의 배너 너비 — 리터럴을 쓰지 않는다(공용 규율). 미러는
-     packages/ui 를 쓰지 않으므로 같은 뜻의 토큰을 여기 둔다. */
-  --container: 1080px;
-  --container-narrow: 520px;
-  --brand:#147B58; --brand-deep:#0F6347; --brand-bright:#1FA173; --brand-tint:#E3F2EC;
-  --ink:#0F1E18; --slate:#334155; --muted:#64748B;
-  --bg:#FFFFFF; --surface:#F6FAF8; --border:#E2E8F0; --dark:#07140E;
-  --radius:16px; --radius-ctl:10px;
-  --shadow:0 10px 30px -12px rgba(15,30,24,.18);
-  --body:'Pretendard',system-ui,-apple-system,sans-serif;
+/* 공용 셀렉트(Radix 채택) — 열린 목록까지 우리 토큰으로. 정의 SSOT = app/select.css.
+   ⛔workos.css 전체를 반입하지 않는다(태그 셀렉터가 admin Tailwind 를 때린다). */
+@import './select.css';
+
+/* ★Tailwind v4 [대표님 승인 2026-10-13 — 전 앱 v4 통일 1단계].
+   v3 의 @tailwind 3줄 + tailwind.config.ts 를 대체한다. 설정은 더 이상 JS 가 아니라 «이 CSS»다.
+   ⛔preflight 를 끄지 않는다 — admin 은 자작 전역 CSS(globals 3,125줄)를 들이지 않는 앱이라
+     리셋 충돌이 없다. job·edu 에 도입할 때는 반드시 끈다(그 앱들은 자작 CSS 가 바탕이다). */
+@import "tailwindcss";
+
+/* 다크 모드 — v4 기본은 prefers-color-scheme 이다. 우리는 next-themes 의 .dark 클래스로 켠다. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 콘텐츠 경로 — v4 는 자동 탐지하지만, 워크스페이스 공용 패키지는 명시해야 클래스가 살아남는다.
+   ⛔이 줄이 없으면 packages/ui 안에서 쓴 Tailwind 클래스가 «조용히» 빠진다. */
+@source "../app";
+@source "../components";
+@source "../hooks";
+
+/* 시맨틱 토큰 → 유틸리티 연결(v3 tailwind.config.ts theme.extend.colors 의 이관본).
+   값은 아래 :root 의 CSS 변수가 쥔다 — 색을 여기 적지 않는다. */
+@theme inline {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  /* ★레거시 KPS 토큰을 «유틸리티»로 낸다 [2026-10-13 · 대표님 다크모드 지적]
+     이 토큰들은 .dark 에서 이미 올바르게 뒤집혀 있었다(--ink: #0F1E18 → #E6EDEA).
+     그런데 화면이 `text-slate-900` 같은 «고정 팔레트»를 써서 다크에서 그대로 검정이었다 —
+     「운영 Cockpit」 대비 1.04, 계정 이메일 1.02[실측]. 긁어야 보였다.
+     ⇒ 토큰을 쓸 수 있게 열어 두고, 고정색을 이 쪽으로 옮긴다. */
+  --color-ink: var(--ink);
+  --color-slate: var(--slate);
+  --color-faint: var(--text-muted);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-green: var(--green);
+  --color-green-700: var(--green-700);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.6;
-  -webkit-font-smoothing:antialiased}
-a{color:var(--brand-deep)}
-.wrap{max-width:var(--container);margin:0 auto;padding:0 20px}
+
+/* v4 는 기본 테두리색이 currentColor 다(v3 는 gray-200) — 우리 토큰으로 되돌린다.
+   ⛔이 블록이 없으면 border 클래스만 쓴 자리가 «글자색 테두리»로 뜬다. */
+@layer base {
+  *, ::after, ::before { border-color: hsl(var(--border)); }
+}
+
+/* ★shadcn/ui 시맨틱 토큰 [대표님 결정 2026-09-13 — shadcn 근간·tremor 퇴출].
+   값은 «우리 브랜드»다 — Aurora Green(#147B58)을 primary 로 둔다. 기본 팔레트를 쓰지 않는다.
+   ⛔hsl() 로 적는다 — shadcn 컴포넌트가 hsl(var(--x) / <alpha>) 형태로 투명도를 섞는다.
+   ⛔tremor 토큰과 «나란히» 둔다. 17개 화면이 아직 tremor 다 — 마지막 화면이 떠날 때 함께 지운다. */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 160 33% 9%;          /* #0F1E18 ink */
+  --card: 0 0% 100%;
+  --card-foreground: 160 33% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 160 33% 9%;
+  --primary: 162 71% 28%;            /* #147B58 Aurora Green */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 155 33% 93%;          /* #E3F2EC brand faint */
+  --secondary-foreground: 163 73% 22%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;   /* #64748B slate-500 */
+  --accent: 155 33% 93%;
+  --accent-foreground: 163 73% 22%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;             /* #E2E8F0 */
+  --input: 214 32% 91%;
+  --ring: 162 71% 28%;
+  --radius: 0.625rem;
+}
+
+/* ★다크 모드(대표님 지시 2026-10-12 「입력자의 편의」) — next-themes 의 class 전략.
+   ⛔색을 화면에 하드코딩하면 여기서 뒤집히지 않는다. 색은 토큰으로만 쓴다.
+   대비: 본문 #E6EDEA on #0F1512 ≈ 13:1 · primary #34D39A on 다크 ≈ 7:1 (WCAG AA 4.5:1 상회). */
+/* 이관 CRUD(인라인 스타일)용 디자인 토큰 — Aurora Green.
+   🔴2026-10-12 — 여기서 --border·--muted 를 «hex»로 재정의해 위의 shadcn HSL 토큰을 덮고 있었다.
+     shadcn 은 hsl(var(--border)) 로 읽으므로 hsl(#E2E8F0) = «무효값» → 테두리·보조색이 전역에서 깨졌다.
+     ⇒ 레거시 이름을 --line / --text-muted 로 분리한다. ⛔shadcn 토큰 이름을 다시 쓰지 말 것.
+   🔴🔴2026-10-13 — 이 블록이 «.dark 블록 뒤»에 있었다. 특이도가 같으니 «순서»가 이기고,
+     그래서 .dark 가 뒤집어 둔 --ink·--slate·--surface 를 라이트 값으로 도로 덮었다.
+     ⇒ 다크모드에서 「운영 Cockpit」이 #0F1E18 로 떠 배경(#0F1413)에 묻혔다. 대비 1.04[실측].
+     ⛔선언을 .dark «앞»에 둔다. 토큰 블록의 순서가 곧 테마의 승패다. */
+:root {
+  --line: #E2E8F0; --text-muted: #64748B; --ink: #0F1E18; --slate: #334155;
+  --green: #147B58; --green-700: #0F6347; --surface: #F6FAF8;
+  --warn: #B45309; --warn-bg: #FFFBEB;   /* 경고 — 라이트(amber-700 과 같은 톤) */
+  /* ★토큰을 정본과 맞춘다 [2026-09-13] — 종전엔 --head 가 system-ui 우선이라 Pretendard 가
+     있어도 안 쓰였다. packages/ui/globals.css 의 선언과 «같은 순서»로 고친다. */
+  --head: 'Pretendard', system-ui, sans-serif;
+  --body: 'Pretendard', system-ui, sans-serif;
+}
+
+.dark {
+  --background: 165 14% 7%;          /* #0F1512 */
+  --foreground: 156 14% 91%;         /* #E6EDEA */
+  --card: 165 12% 10%;
+  --card-foreground: 156 14% 91%;
+  --popover: 165 12% 10%;
+  --popover-foreground: 156 14% 91%;
+  --primary: 159 63% 52%;            /* #34D39A — 어두운 바탕에서 읽히는 명도 */
+  --primary-foreground: 165 30% 8%;
+  --secondary: 165 10% 16%;
+  --secondary-foreground: 156 14% 91%;
+  --muted: 165 9% 17%;
+  --muted-foreground: 155 8% 65%;
+  --accent: 165 10% 18%;
+  --accent-foreground: 156 14% 91%;
+  --destructive: 0 62% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 165 8% 22%;
+  --input: 165 8% 24%;
+  --ring: 159 63% 52%;
+}
+.dark {
+  --line: #2A3330; --text-muted: #9BA7A2; --ink: #E6EDEA; --slate: #C3CDC9;
+  /* 오른쪽 계정 패널 바탕 — 글자(--ink)와 «같이» 뒤집혀야 한다(2026-10-13) */
+  --panel-bg: #161D1B;
+  /* 다크의 --green 은 밝다(#34D39A) — 그 위에 흰 글자는 묻힌다(대비 1.92). 어두운 글자를 올린다. */
+  --on-green: #0F1512;
+  /* 필수 표시 * 등 — 라이트의 빨강(0 72% 51%)은 어두운 바탕에서 3.84 로 묻힌다(2026-10-13 실측).
+     다크에서는 밝은 빨강을 쓴다. */
+  --destructive: 0 84% 70%;
+  --warn: #FBBF24; --warn-bg: #2A2112;   /* 경고 — 다크에서는 밝은 호박색이어야 읽힌다 */
+  --green: #34D39A; --green-700: #5BE3B3; --surface: #141B18;
+  /* 사이드바도 함께 뒤집는다 — 한쪽만 어두우면 더 조악해 보인다 */
+  --sidebar-background: 165 13% 9%;
+  --sidebar-foreground: 155 8% 65%;
+  --sidebar-primary: 159 63% 52%;
+  --sidebar-primary-foreground: 165 30% 8%;
+  --sidebar-accent: 165 12% 15%;
+  --sidebar-accent-foreground: 159 63% 62%;
+  --sidebar-border: 165 8% 20%;
+  --sidebar-ring: 159 63% 52%;
+}
+
+/* ★폰트를 body 에 «적용»한다 — 변수만 선언하고 쓰지 않아 admin 만 다른 글꼴로 떠 있었다. */
+body { background: hsl(var(--background)); color: hsl(var(--foreground)); font-family: var(--body); }
+h1, h2, h3 { font-family: var(--head); letter-spacing: -.02em; }
+
+@layer base {
+  /* ★사이드바 토큰 — shadcn Sidebar 가 읽는 유일한 자리.
+     값은 **지금 admin 사이드바가 쓰던 색 그대로**다(흰 배경 · 활성 #E3F2EC/#0F6347 · 테두리 slate-100).
+     ⛔색을 바꾸는 것은 디자인 결정이다. 바꿀 때도 «여기 8줄»만 고친다 — 컴포넌트에 색을 적지 않는다.
+     ⛔.dark 블록을 두지 않는다 — admin 은 다크모드를 켜지 않는다(켜는 날 여기에 추가한다). */
+  :root {
+    --sidebar-background: 0 0% 100%;        /* #FFFFFF */
+    --sidebar-foreground: 215 16% 47%;      /* slate-500 — 비활성 글자 */
+    --sidebar-primary: 160 74% 22%;         /* #0F6347 */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 156 37% 92%;          /* #E3F2EC — 활성 배경 */
+    --sidebar-accent-foreground: 160 74% 22%; /* #0F6347 — 활성 글자 */
+    --sidebar-border: 210 40% 96%;          /* slate-100 */
+    --sidebar-ring: 160 72% 28%;            /* #147B58 — 포커스 링 */
+  }
+}

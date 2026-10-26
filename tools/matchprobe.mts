@@ -7,7 +7,7 @@
 // 사용: export DATABASE_URL=...  # .env.example 참조
 //      npx tsx tools/matchprobe.mts [--source 샘플풀-2026-10]
 import { execFileSync } from 'node:child_process'
-import { rankInstructors, type InstructorRow, type DemandProfile } from 'edu-instructor-match/edu'
+import { rankInstructors, type InstructorRow, type DemandProfile } from '@/lib/matching/instructor'
 
 const idx = process.argv.indexOf('--source')
 const SOURCE = idx > 0 ? process.argv[idx + 1] : '샘플풀-2026-10'
