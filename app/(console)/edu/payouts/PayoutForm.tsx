@@ -50,7 +50,11 @@ export function PayoutForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 flex flex-wrap items-start gap-3">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        data-contract-id={contractId}
+        className="mt-2 flex flex-wrap items-start gap-3"
+      >
         <FormField control={form.control} name="sessionsDone" render={({ field }) => (
           <FormItem className="w-28">
             <FormLabel className="text-xs">실시한 회차</FormLabel>

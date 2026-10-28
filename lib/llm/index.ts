@@ -63,7 +63,10 @@ export function visionChain(): LLMChoice[] {
 const TEXT_MODELS: Record<LLMProvider, string> = {
   openai: 'gpt-4o-mini',
   gemini: 'gemini-3.6-flash',
-  anthropic: 'claude-opus-4-8',
+  // ★텍스트 폴백은 가용성이 목적 — Haiku 4.5($1/$5) [대표이사 결재 2026-10-27].
+  //   ⛔VISION_MODELS 는 건드리지 않았다 — 비전은 등록증 판독처럼 정확도가 돈과 직결되는 축이라
+  //     단가로 내릴 자리가 아니다(별건).
+  anthropic: 'claude-haiku-4-5',
 }
 const TEXT_ORDER: LLMProvider[] = ['openai', 'gemini', 'anthropic']
 

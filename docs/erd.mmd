@@ -1,7 +1,7 @@
 %% 자동 생성 — tools/make-erd.mjs · 운영 환경 스키마 실측본
 %% ⛔손으로 고치지 않는다. 스키마를 바꾼 뒤 다시 생성한다.
-%% 표 24개 · 관계 50개 · 공통 칸(created_at·updated_at)은 생략
-%% ⛔뷰 2개는 그리지 않는다(실체가 아니라 조회 경로다): edu_order_direct_cost_v · edu_public_feedback
+%% 표 25개 · 관계 53개 · 공통 칸(created_at·updated_at)은 생략
+%% ⛔뷰 3개는 그리지 않는다(실체가 아니라 조회 경로다): edu_order_direct_cost_v · edu_public_feedback · edu_share_payout_v
 %% 외부 참조 2종(컬럼 정의 없이 관계만 그린다): auth.users · srm_requests
 erDiagram
   auth_users |o--o{ edu_attendance : "checked_by"
@@ -54,6 +54,9 @@ erDiagram
   edu_enrollments |o--o{ edu_reviews : "rater_enrollment_id ⟲"
   edu_instructors |o--o{ edu_reviews : "rater_instructor_id ⟲"
   edu_cohorts ||--o{ edu_sessions : "cohort_id ⟲"
+  auth_users |o--o{ edu_share_payees : "approved_by"
+  edu_instructors |o--o{ edu_share_payees : "instructor_id"
+  edu_revenue_shares ||--o{ edu_share_payees : "share_id"
 
   edu_attendance {
     uuid id PK
@@ -393,8 +396,8 @@ erDiagram
     int direct_cost
     int lead_fee_paid
     int gross_profit
-    numeric lead_share_rate
-    int lead_share
+    numeric side_share_rate
+    int side_share
     int company_share
     bool provisional
     text basis
@@ -436,4 +439,29 @@ erDiagram
     timestamptz open_call_closed_at "null 허용"
     text open_call_note "null 허용"
     int open_call_fee "null 허용"
+  }
+  edu_share_payees {
+    uuid id PK
+    uuid share_id FK
+    text payee_name
+    text payee_role
+    uuid instructor_id FK "null 허용"
+    numeric share_rate "null 허용"
+    int gross
+    text income_kind
+    int tax_base
+    int income_tax
+    int local_tax
+    int net
+    text basis
+    text status
+    text cancel_reason "null 허용"
+    timestamptz approved_at "null 허용"
+    uuid approved_by FK "null 허용"
+    timestamptz paid_at "null 허용"
+    text paid_note "null 허용"
+    bool is_test
+    text proposed_by
+    timestamptz agreed_at "null 허용"
+    text agreed_note "null 허용"
   }

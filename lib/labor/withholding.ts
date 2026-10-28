@@ -20,11 +20,19 @@
 /** 적용 연도 — 세율이 개정되면 연도를 더해 분기한다(지금은 한 벌뿐이다). */
 export const WITHHOLDING_YEAR = 2026
 
-export type InstructorIncomeKind = 'business' | 'other'
+/** 소득 구분 — ★넷이 아니라 셋으로 적는다. 원천징수 «여부»가 갈리는 축이다.
+ *  business = 면세 인적용역을 계속·반복 제공하는 개인(3%)
+ *  other    = 일시적으로 제공하는 개인(필요경비 60% 공제 후 20%)
+ *  exempt   = ★부가가치세 과세사업자 또는 법인 — **원천징수 대상이 아니다**
+ *             근거 = 소득세법 §127①3호가 원천징수 대상 사업소득을 「부가가치세가 면제되는 인적용역」에
+ *             한정한다(부가세법 §26①15호). 세금계산서를 발급하는 자에게 3%를 떼면 매입세액을 공제받지
+ *             못하고 적격증빙 미수취 가산세까지 붙는다 — 당사 손실이다[CFO 2026-10-27]. */
+export type InstructorIncomeKind = 'business' | 'other' | 'exempt'
 
 export const INCOME_KIND_LABEL: Record<InstructorIncomeKind, string> = {
   business: '사업소득',
   other: '기타소득',
+  exempt: '원천징수 없음(세금계산서)',
 }
 
 /** 사업소득 원천징수율 — 소득세법 §129①3호 가목. */
@@ -65,6 +73,16 @@ const cut10 = (n: number) => Math.floor(n / 10) * 10
  */
 export function instructorWithholding(gross: number, kind: InstructorIncomeKind): WithholdingResult {
   const g = Math.max(0, Math.round(gross))
+  // ★과세사업자·법인 — 원천징수하지 않는다. 대신 세금계산서를 받고 부가세를 더해 지급한다.
+  if (kind === 'exempt') {
+    return {
+      kind, gross: g, taxBase: g, incomeTax: 0, localTax: 0, totalTax: 0, net: g,
+      belowMinimum: false,
+      basis: `원천징수 대상 아님 — 부가가치세 과세사업자 또는 법인(소득세법 §127①3호는 원천징수 대상 사업소득을`
+        + ` 「부가가치세가 면제되는 인적용역」에 한정한다) · 지급액 ${g.toLocaleString()}원 전액 지급 ·`
+        + ` 세금계산서를 받고 부가가치세 ${Math.round(g * 0.1).toLocaleString()}원을 더하여 지급한다`,
+    }
+  }
   if (kind === 'business') {
     const incomeTax = cut10(g * BUSINESS_INCOME_RATE)
     const localTax = cut10(incomeTax * LOCAL_TAX_RATE)

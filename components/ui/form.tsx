@@ -109,12 +109,19 @@ const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+  const { error, name, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
     <Slot
       ref={ref}
       id={formItemId}
+      // ★[2026-10-27] 칸의 «이름»을 DOM 에 남긴다 — 검사기가 칸을 집을 유일한 안정 앵커다.
+      //   id 는 useId 가 정하므로 예측할 수 없고, Radix Select·Checkbox 는 native 요소가 아니라
+      //   `name` 속성조차 없다. 그 때문에 matrixguard 가 「개설 폼에 과정 칸이 없다」고 보고했고
+      //   (제품은 정상이었다) priceguard·payoutguard 는 2주 동안 멀어 있었다.
+      //   ⇒ 공통 규격이 앵커를 «스스로» 주면 화면을 고쳐도 측정이 끊기지 않는다.
+      //   ⛔시각 영향 없음(속성만 추가) · ⛔사용자에게 보이는 값이 아니다.
+      data-field={name}
       aria-describedby={
         !error
           ? `${formDescriptionId}`
